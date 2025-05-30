@@ -1,0 +1,172 @@
+#include <iostream>
+using namespace std;
+
+
+// Weighted Graph using Adjacency Matrix
+
+template<int MAX_VERTICES>
+class WeightedGraphMatrix {
+    int matrix[MAX_VERTICES][MAX_VERTICES];
+    char vertices[MAX_VERTICES];
+    int vertexCount;
+
+public:
+    WeightedGraphMatrix() {
+        vertexCount = 0;
+        for (int i = 0; i < MAX_VERTICES; ++i)
+            for (int j = 0; j < MAX_VERTICES; ++j)
+                matrix[i][j] = 0;
+    }
+
+    bool addVertex(char label) {
+        if (vertexCount >= MAX_VERTICES) return false;
+        vertices[vertexCount++] = label;
+        return true;
+    }
+
+    int getIndex(char label) {
+        for (int i = 0; i < vertexCount; ++i)
+            if (vertices[i] == label)
+                return i;
+        return -1;
+    }
+
+    bool addEdge(char from, char to, int weight) {
+        int i = getIndex(from), j = getIndex(to);
+        if (i == -1 || j == -1) return false;
+        matrix[i][j] = weight;
+        return true;
+    }
+
+    void print() {
+        cout << "Adjacency Matrix:\n";
+        for (int i = 0; i < vertexCount; ++i) {
+            cout << vertices[i] << ": ";
+            for (int j = 0; j < vertexCount; ++j)
+                cout << matrix[i][j] << " ";
+            cout << endl;
+        }
+    }
+};
+
+int main(){
+WeightedGraphMatrix<5> g2;
+g2.addVertex('A');
+g2.addVertex('B');
+g2.addVertex('C');
+g2.addEdge('A', 'B', 5);
+g2.addEdge('A', 'C', 10);
+g2.addEdge('B', 'C', 2);
+g2.print();
+
+return 0;
+}
+
+
+
+
+
+#include <iostream>
+using namespace std;
+
+//Weighted Graph using Adjacency List
+
+
+class Edge {
+public:
+    int weight;
+    class Vertex* destination;
+    Edge* next;
+
+    Edge(Vertex* dest, int w) {
+        destination = dest;
+        weight = w;
+        next = nullptr;
+    }
+};
+
+class Vertex {
+public:
+    char data;
+    Edge* edgeList;
+    Vertex* next;
+
+    Vertex(char d) {
+        data = d;
+        edgeList = nullptr;
+        next = nullptr;
+    }
+
+    void connectTo(Vertex* dest, int weight) {
+        Edge* newEdge = new Edge(dest, weight);
+        newEdge->next = edgeList;
+        edgeList = newEdge;
+    }
+
+    void printEdges() {
+        Edge* e = edgeList;
+        while (e) {
+            cout << data << " -> " << e->destination->data << " (w:" << e->weight << ")\n";
+            e = e->next;
+        }
+    }
+
+    void printGraph() {
+        printEdges();
+        if (next) next->printGraph();
+    }
+};
+
+class Graph {
+    Vertex* head;
+
+public:
+    Graph() {
+        head = nullptr;
+    }
+
+    Vertex* find(char val) {
+        Vertex* temp = head;
+        while (temp) {
+            if (temp->data == val) return temp;
+            temp = temp->next;
+        }
+        return nullptr;
+    }
+
+    bool addVertex(char val) {
+        if (find(val)) return false;
+        Vertex* newVertex = new Vertex(val);
+        newVertex->next = head;
+        head = newVertex;
+        return true;
+    }
+
+    bool addEdge(char from, char to, int weight) {
+        Vertex* v1 = find(from);
+        Vertex* v2 = find(to);
+        if (!v1 || !v2) return false;
+        v1->connectTo(v2, weight);
+        return true;
+    }
+
+    void print() {
+        if (head) head->printGraph();
+    }
+};
+
+int main() {
+    // Using adjacency list
+    Graph g;
+    g.addVertex('A');
+    g.addVertex('B');
+    g.addVertex('C');
+    g.addEdge('A', 'B', 5);
+    g.addEdge('A', 'C', 10);
+    g.addEdge('B', 'C', 2);
+    g.print();
+
+    return 0;
+}
+
+
